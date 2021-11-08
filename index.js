@@ -1,6 +1,9 @@
 const hitWeights = [5, 3, 2, 1]
 const missWeights = [5, 1, 1, 1, 1]
 
+//const hitWeights = [2, 1, 4, 1]
+//const missWeights = [1, 2, 1, 1, 3]
+
 const dp = [...new Array(missWeights.length)].map((_, i) => new Array(missWeights.length - i).fill({
   weight: null,
   cost: null,
@@ -36,43 +39,41 @@ for (let i = 1; i < dp.length; i += 1) {
 
     // at this point our weights are correct
 
-    // find cost via dp
-    const cost = weight + Math.min(dp[i - 1][j].cost, dp[i - 1][j + 1].cost)
-
     // find root
     // we want to check to see for all possible roots from j --> j + i
     // cost{optimal left} + weight{root} + cost{optimal right}
     let root = j + 1
-    if (i > 1) {
-      const start = j
-      const end = i + j
-      for (let r = start; r <= end; r += 1) {
+    let cost = Infinity;
 
-        // optimal costs of left and right sub-trees given root r and inherited contraints i, j
-        let optimalLeft = 0
-        let optimalRight = 0
+    const start = j
+    const end = i + j
+    for (let r = start; r < end; r += 1) {
 
-        // set left
-        if (r - start - 1 >= 0) {
-          optimalLeft = dp[r - start - 1][start].cost
-        }
+      // optimal costs of left and right sub-trees given root r and inherited contraints i, j
+      let optimalLeft = 0
+      let optimalRight = 0
 
-        // set left
-        if (end - r - 1 >= 0) {
-          optimalRight = dp[end - r - 1][r + 1].cost
-        }
-
-
-        // cost{left} + weight{root} + cost{right} === opt{cost}
-        if (optimalLeft + weight + optimalRight === cost) {
-          /*
-          console.log(`optimal root ${[j, i]} set: ${r + 1}`)
-          console.log(`optimal left: ${optimalLeft}, optimal right: ${optimalRight}`)
-          */
-          root = r + 1
-        }
+      // set left
+      if (r - start - 1 >= 0) {
+        optimalLeft = dp[r - start][start].cost
       }
+
+      // set right
+      if (end - r - 1 >= 0) {
+        optimalRight = dp[end - r - 1][r + 1].cost
+      }
+
+      const curCost = weight + optimalLeft + optimalRight
+
+      // if this root is optimal thusfar, then set it
+      if (curCost < cost) {
+        cost = curCost
+        root = r + 1
+      }
+
+
     }
+
 
     dp[i][j] = {
       weight,

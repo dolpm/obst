@@ -112,7 +112,7 @@ const buildTree = (root, curr_index = 0, index = false, delimiter = '-') => {
   if (!root) return [[], 0, 0, 0];
   let line1 = [];
   let line2 = []
-  let node_repr = index ? `${curr_index}${delimiter}${root.value}` : String(root.value);
+  let node_repr = index ? `${curr_index}${delimiter}${root.value}` : root.value;
   let new_root_width = node_repr.length;
   let gap_size = node_repr.length;
   let [l_box, l_box_width, l_root_start, l_root_end] = buildTree(root.left, (2 * curr_index) + 1, index, delimiter);
@@ -161,7 +161,9 @@ const printTree = (root, { totalCost, totalWeight }) => {
   for (let line of lines) {
     output += line + '\n';
   }
+  process.stdout.write('\x1b[36m')
   console.log(output)
+  process.stdout.write('\x1b[31m')
   console.log(`total tree cost: ${totalCost}`)
   console.log(`total tree weight: ${totalWeight}`)
   console.log('\n\n')

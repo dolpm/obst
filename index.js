@@ -89,11 +89,11 @@ const generateOptimalTree = (nodeCount, startNode, endNode, data) => {
 
 
   if (startNode + nodeCount > endNode) {
-    return { value: `[v: null, w: ${data[0][startNode].weight}]` }
+    return { value: `[nil (${data[0][startNode].weight})]` }
   }
 
   if (data[nodeCount][startNode].root === null) {
-    return { value: `[v: null, w: ${data[nodeCount][startNode].weight}]` }
+    return { value: `[nil (${data[nodeCount][startNode].weight})]` }
   }
 
   const root = data[nodeCount][startNode].root
@@ -102,7 +102,7 @@ const generateOptimalTree = (nodeCount, startNode, endNode, data) => {
   const right = generateOptimalTree(data.length - 1 - root, root, endNode, data)
 
   return {
-    value: `[v: ${root}, w: ${data[nodeCount][startNode].weight}]`,
+    value: `[${root}]`,
     left,
     right
   }
@@ -155,16 +155,23 @@ const buildTree = (root, curr_index = 0, index = false, delimiter = '-') => {
 };
 
 // https://github.com/saibabanadh/print-bst/blob/master/bst.js
-const printTree = (root) => {
+const printTree = (root, { totalCost, totalWeight }) => {
+  console.log('\n\n')
   let lines = buildTree(root)[0];
   let output = "";
   for (let line of lines) {
     output += line + '\n';
   }
   console.log(output)
+  console.log(`total tree cost: ${totalCost}`)
+  console.log(`total tree weight: ${totalWeight}`)
+  console.log('\n\n')
 }
 
 
 const calculated = calc([5, 3, 2, 1], [5, 1, 1, 1, 1])
 const optimal = generateOptimalTree(calculated.length - 1, 0, calculated.length - 1, calculated)
-printTree(optimal)
+printTree(optimal, {
+  totalCost: calculated[calculated.length - 1][0].cost,
+  totalWeight: calculated[calculated.length - 1][0].weight
+})

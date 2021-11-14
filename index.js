@@ -82,11 +82,10 @@ const calc = (hitWeights, missWeights) => {
   return dp
 }
 
-const generateOptimalTree = (nodeCount, startNode, endNode, data) => {
+const generateOptimalTree = (nodeCount, startNode, endNode, data, hitWeights) => {
   if (data[nodeCount] === 0 || data[nodeCount][startNode] === null) {
     return null
   }
-
 
   if (startNode + nodeCount > endNode) {
     return { value: `[nil (${data[0][startNode].weight})]` }
@@ -98,11 +97,11 @@ const generateOptimalTree = (nodeCount, startNode, endNode, data) => {
 
   const root = data[nodeCount][startNode].root
 
-  const left = generateOptimalTree(root - startNode - 1, startNode, root - 1, data)
-  const right = generateOptimalTree(data.length - 1 - root, root, endNode, data)
+  const left = generateOptimalTree(root - startNode - 1, startNode, root - 1, data, hitWeights)
+  const right = generateOptimalTree(endNode - root, root, endNode, data, hitWeights)
 
   return {
-    value: `[${root}]`,
+    value: `[${root} (${hitWeights[root - 1]})]`,
     left,
     right
   }
@@ -168,10 +167,15 @@ const printTree = (root, { totalCost, totalWeight }) => {
   console.log('\n\n')
 }
 
+const run = (hitWeights, missWeights) => {
+  const calculated = calc(hitWeights, missWeights)
+  const optimal = generateOptimalTree(calculated.length - 1, 0, calculated.length - 1, calculated, hitWeights)
+  printTree(optimal, {
+    totalCost: calculated[calculated.length - 1][0].cost,
+    totalWeight: calculated[calculated.length - 1][0].weight
+  })
+}
 
-const calculated = calc([5, 3, 2, 1], [5, 1, 1, 1, 1])
-const optimal = generateOptimalTree(calculated.length - 1, 0, calculated.length - 1, calculated)
-printTree(optimal, {
-  totalCost: calculated[calculated.length - 1][0].cost,
-  totalWeight: calculated[calculated.length - 1][0].weight
-})
+run([5, 3, 2, 1], [5, 1, 1, 1, 1])
+run([32, 12, 10, 13], [1, 2, 32, 1, 3])
+run([94, 12, 10, 13, 18], [81, 42, 32, 1, 3, 84])

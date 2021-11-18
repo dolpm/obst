@@ -1,4 +1,6 @@
 const calc = (hitWeights, missWeights) => {
+
+  // generate our DP array
   const dp = [...new Array(missWeights.length)].map((_, i) => new Array(missWeights.length - i).fill({
     weight: null,
     cost: null,
@@ -6,7 +8,7 @@ const calc = (hitWeights, missWeights) => {
   }))
 
 
-  // base case
+  // base case(s)
   for (let i = 0; i < dp.length; i += 1) {
     dp[0][i] = {
       ...dp[0][i],
@@ -31,8 +33,6 @@ const calc = (hitWeights, missWeights) => {
       for (let miss = j; miss < j + i + 1; miss += 1) {
         weight += missWeights[miss]
       }
-
-      // at this point our weights are correct
 
       // find root
       // we want to check to see for all possible roots from j --> j + i
@@ -83,25 +83,29 @@ const calc = (hitWeights, missWeights) => {
 }
 
 const generateOptimalTree = (nodeCount, startNode, endNode, data, hitWeights) => {
+  // handle null cases
   if (data[nodeCount] === 0 || data[nodeCount][startNode] === null) {
     return null
   }
 
+  // handle nil cases
   if (startNode + nodeCount > endNode) {
-    return { value: `[nil (${data[0][startNode].weight})]` }
+    return { value: `[nil_${startNode} (${data[0][startNode].weight})]` }
   }
 
   if (data[nodeCount][startNode].root === null) {
-    return { value: `[nil (${data[nodeCount][startNode].weight})]` }
+    return { value: `[nil_${startNode} (${data[nodeCount][startNode].weight})]` }
   }
 
   const root = data[nodeCount][startNode].root
 
+  // build the optimal sub-trees for this root
   const left = generateOptimalTree(root - startNode - 1, startNode, root - 1, data, hitWeights)
   const right = generateOptimalTree(endNode - root, root, endNode, data, hitWeights)
 
+  // wire it all up
   return {
-    value: `[${root} (${hitWeights[root - 1]})]`,
+    value: `[node_${root} (${hitWeights[root - 1]})]`,
     left,
     right
   }
@@ -170,14 +174,21 @@ const printTree = (root, { totalCost, totalWeight }) => {
 }
 
 const run = (hitWeights, missWeights) => {
+  // create our DP table
   const calculated = calc(hitWeights, missWeights)
+  // generate our optimal tree
   const optimal = generateOptimalTree(calculated.length - 1, 0, calculated.length - 1, calculated, hitWeights)
+  // print the tree
   printTree(optimal, {
     totalCost: calculated[calculated.length - 1][0].cost,
     totalWeight: calculated[calculated.length - 1][0].weight
   })
 }
 
+// class/pset examples
 run([5, 3, 2, 1], [5, 1, 1, 1, 1])
-run([32, 12, 10, 13], [1, 2, 32, 1, 3])
-run([94, 12, 10, 13, 18], [81, 42, 32, 1, 3, 84])
+run([2, 1, 4, 1], [1, 2, 1, 1, 3])
+
+// 
+run([15, 10, 5, 10, 20], [5, 10, 5, 5, 5, 10])
+run([3, 3, 1, 1], [2, 3, 1, 1, 1])

@@ -171,7 +171,7 @@ const printTree = (root, { totalCost, totalWeight }) => {
   process.stdout.write('\x1b[31m')
   console.log(`total tree cost: ${totalCost}`)
   console.log(`total tree weight: ${totalWeight}`)
-  console.log('\n\n')
+  console.log('\x1b[0m\n\n')
 }
 
 const run = (hitWeights, missWeights) => {

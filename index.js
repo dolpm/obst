@@ -1,12 +1,10 @@
 const calc = (hitWeights, missWeights) => {
-
   // generate our DP array
   const dp = [...new Array(missWeights.length)].map((_, i) => new Array(missWeights.length - i).fill({
     weight: null,
     cost: null,
     root: null
   }))
-
 
   // base case(s)
   for (let i = 0; i < dp.length; i += 1) {
@@ -42,6 +40,7 @@ const calc = (hitWeights, missWeights) => {
 
       const start = j
       const end = i + j
+      // try all roots in the range {startNode}:{startNode + nodeCount} which is {j}{i + j}
       for (let r = start; r < end; r += 1) {
 
         // optimal costs of left and right sub-trees given root r and inherited contraints i, j
@@ -58,17 +57,16 @@ const calc = (hitWeights, missWeights) => {
           optimalRight = dp[end - r - 1][r + 1].cost
         }
 
+        // calculate node cost
         const curCost = weight + optimalLeft + optimalRight
 
-        // if this root is optimal thusfar, then set it
+        // if this root is optimal thusfar (cost is minimized), update the optimal
+        // root and cost
         if (curCost < cost) {
           cost = curCost
           root = r + 1
         }
-
-
       }
-
 
       dp[i][j] = {
         weight,
@@ -88,19 +86,22 @@ const generateOptimalTree = (nodeCount, startNode, endNode, data, hitWeights) =>
     return null
   }
 
-  // handle nil cases
+  // too many nodes!
   if (startNode + nodeCount > endNode) {
     return { value: `[nil_${startNode} (${data[0][startNode].weight})]` }
   }
 
+  // nil node encountered
   if (data[nodeCount][startNode].root === null) {
     return { value: `[nil_${startNode} (${data[nodeCount][startNode].weight})]` }
   }
 
   const root = data[nodeCount][startNode].root
 
-  // build the optimal sub-trees for this root
+  // build optimal left subTree for root
   const left = generateOptimalTree(root - startNode - 1, startNode, root - 1, data, hitWeights)
+
+  // build optimal right subTree for root
   const right = generateOptimalTree(endNode - root, root, endNode, data, hitWeights)
 
   // wire it all up
@@ -189,6 +190,6 @@ const run = (hitWeights, missWeights) => {
 run([5, 3, 2, 1], [5, 1, 1, 1, 1])
 run([2, 1, 4, 1], [1, 2, 1, 1, 3])
 
-// 
+// online examples
 run([15, 10, 5, 10, 20], [5, 10, 5, 5, 5, 10])
 run([3, 3, 1, 1], [2, 3, 1, 1, 1])
